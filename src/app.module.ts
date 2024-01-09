@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Car } from './cars/schemas/car.model';
+import { OrdersModule } from './orders/orders.module';
+import { Order } from './orders/schemas/order.model';
 
 @Module({
   imports: [
@@ -13,8 +15,9 @@ import { Car } from './cars/schemas/car.model';
       username: 'postgres',
       password: '192347',
       database: 'Booking',
-      models: [Car],
+      models: [Car, Order],
     }),
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
