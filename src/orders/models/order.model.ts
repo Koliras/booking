@@ -2,7 +2,6 @@ import { AllowNull, AutoIncrement, Column, Model, PrimaryKey, Table } from 'sequ
 
 @Table({ timestamps: false, underscored: true })
 export class Order extends Model {
-  @AutoIncrement
   @PrimaryKey
   @Column
   id: string;
