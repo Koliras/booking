@@ -22,7 +22,7 @@ export class OrdersService {
     })
   }
 
-  async createOne(order) {
+  async createOne(order: Order) {
     return this.orderModel.create({ ...order, id: uuidv4()});
   }
 

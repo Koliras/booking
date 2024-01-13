@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Car } from '../models/car.model';
 import { InjectModel } from '@nestjs/sequelize';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CarsService {
@@ -21,11 +22,23 @@ export class CarsService {
     })
   }
 
+  async createOne({ model, price, amountAvailable }: Car) {
+    return this.carModel.create({ model, price, amountAvailable, id: uuidv4()});
+  }
+
+  async editOne(id: string, { model, price, amountAvailable }: Car) {
+    const wasUpdated = await this.carModel.update({ model, price, amountAvailable }, { where: { id } });
+    if (wasUpdated) return { status: 201, message: 'Succesfully updated the car' };
+    throw new NotFoundException('Not found', {
+      description: 'There is no car with such an id',
+    })
+  }
+
   async deleteOne(id: string) {
     const wasDeleted = await this.carModel.destroy({ where: { id } });
     if (wasDeleted) return { status: 201, message: 'Succesfully deleted the car' };
     throw new NotFoundException('Not found', {
-      description: 'There is no car with such an id'
+      description: 'There is no car with such an id',
     })
   }
 }
