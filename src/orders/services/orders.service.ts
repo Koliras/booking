@@ -31,13 +31,15 @@ export class OrdersService {
   }
 
   async createOne({ carId, amount, startDate, endDate }: Order) {
-    // const ordersForTheCar = await this.orderModel.findAll({ where: { id: carId } });
-    // let amountOfAvailableCars = 
-
-    // for (const order of ordersForTheCar) {
-
-    // }
     return this.orderModel.create({ carId, amount, startDate, endDate, id: uuidv4()});
+  }
+
+  async editOne(id: string, { carId, amount, startDate, endDate }: Order) {
+    const wasUpdated = await this.orderModel.update({ carId, amount, startDate, endDate }, { where: { id } });
+    if (wasUpdated) return { status: 201, message: 'Succesfully updated the car' };
+    throw new NotFoundException('Not found', {
+      description: 'There is no car with such an id',
+    })
   }
 
   async deleteOne(id: string) {
