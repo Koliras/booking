@@ -1,23 +1,94 @@
 import { Controller, Delete, Get, Param, UnprocessableEntityException, ConflictException, Post, Body, Patch } from '@nestjs/common';
+import { ApiBody, ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { OrdersService } from '../services/orders.service';
 import { Order } from '../models/order.model';
 import { CarsService } from 'src/cars/services/cars.service';
 
+@ApiTags('Orders Module')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService, private readonly carsService: CarsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all orders from the api'})
+  @ApiResponse({
+    status: 200,
+    description: 'List of all the orders'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
   findAll(): Promise<Order[]> {
     return this.ordersService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a specific order from the api'})
+  @ApiResponse({
+    status: 200,
+    description: 'Specific order from the api'
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No order with such an id'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'uuid',
+    description: 'Unique id',
+    required: true,
+  })
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create an order'})
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        carId: {
+          type: 'uuid',
+          example: '7fd0660b-9eba-4cbc-a769-3abea7202da6',
+          description: 'This is a unique id of the car of the order'
+        },
+        amount: {
+          type: 'integer',
+          example: 5,
+          description: 'This is a requested amount of cars',
+          default: 1
+        },
+        startDate: {
+          type: 'date',
+          example: '2024-02-02',
+          description: 'This is a date of the start of booking of the car(s)'
+        },
+        endDate: {
+          type: 'date',
+          example: '2024-02-013',
+          description: 'This is a date of the end of booking of the car(s)'
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Created an order'
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Incorect input data'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
   async createOne(@Body() order: Order) {
     const { carId, amount = 1, startDate, endDate } = order;
 
@@ -65,6 +136,47 @@ export class OrdersController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Edit the order\'s properties'})
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        carId: {
+          type: 'uuid',
+          example: '7fd0660b-9eba-4cbc-a769-3abea7202da6',
+          description: 'This is a unique id of the car of the order'
+        },
+        amount: {
+          type: 'integer',
+          example: 5,
+          description: 'This is a requested amount of cars',
+          default: 1
+        },
+        startDate: {
+          type: 'date',
+          example: '2024-02-02',
+          description: 'This is a date of the start of booking of the car(s)'
+        },
+        endDate: {
+          type: 'date',
+          example: '2024-02-013',
+          description: 'This is a date of the end of booking of the car(s)'
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Edited the order'
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Incorect input data'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
   async editOne(@Param('id') id: string, @Body() orderToUpdate: Order) {
     const { carId, amount, startDate, endDate } = orderToUpdate;
 
@@ -119,6 +231,25 @@ export class OrdersController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete the order'})
+  @ApiResponse({
+    status: 200,
+    description: 'Deleted specific order from the api'
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No order with such an id'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'uuid',
+    description: 'Unique id',
+    required: true,
+  })
   deleteOne(@Param('id') id: string) {
     return this.ordersService.deleteOne(id);
   }

@@ -1,22 +1,88 @@
 import { Controller, Get, Param, Delete, Post, Body, Patch, UnprocessableEntityException } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CarsService } from '../services/cars.service';
 import { Car } from '../models/car.model';
 
+@ApiTags('Cars Module')
 @Controller('cars')
 export class CarsController {
   constructor(private readonly carsService: CarsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all cars from the api'})
+  @ApiResponse({
+    status: 200,
+    description: 'List of all the cars'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
   findAll(): Promise<Car[]> {
     return this.carsService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a specific car from the api'})
+  @ApiResponse({
+    status: 200,
+    description: 'Specific car from the api'
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No car with such an id'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'uuid',
+    description: 'Unique id',
+    required: true,
+  })
   findOne(@Param('id') id: string) {
     return this.carsService.findOne(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a car'})
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        model: {
+          type: 'string',
+          example: '2024 Acura Integra',
+          description: 'This is a name of the car'
+        },
+        amountAvailable: {
+          type: 'integer',
+          example: 5,
+          description: 'This is total amount of available cars of this model',
+          default: 1
+        },
+        price: {
+          type: 'number',
+          example: 100,
+          description: 'This is the price for 1 day of using the car'
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Created a car'
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Incorect input data'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
   createOne(@Body() car: Car) {
     const { model, price, amountAvailable = 1 } = car;
     if (!model || model.length < 3) throw new UnprocessableEntityException(
@@ -43,6 +109,42 @@ export class CarsController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Edit the car\'s properties'})
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        model: {
+          type: 'string',
+          example: '2024 Acura Integra',
+          description: 'This is a name of the car',
+        },
+        amountAvailable: {
+          type: 'integer',
+          example: 5,
+          description: 'This is total amount of available cars of this model',
+          default: 1
+        },
+        price: {
+          type: 'number',
+          example: 100,
+          description: 'This is the price for 1 day of using the car'
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Edited the car'
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Incorect input data'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
   editOne(@Param('id') id: string, @Body() carToUpdate: Car) {
     const { model, price, amountAvailable } = carToUpdate;
     if (model && model.length < 3) throw new UnprocessableEntityException(
@@ -74,6 +176,25 @@ export class CarsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete the car'})
+  @ApiResponse({
+    status: 200,
+    description: 'Deleted specific car from the api'
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No car with such an id'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error'
+  })
+  @ApiParam({
+    name: 'id',
+    type: 'uuid',
+    description: 'Unique id',
+    required: true,
+  })
   deleteOne(@Param('id') id: string) {
     return this.carsService.deleteOne(id);
   }
