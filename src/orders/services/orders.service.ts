@@ -22,8 +22,22 @@ export class OrdersService {
     })
   }
 
-  async createOne(order: Order) {
-    return this.orderModel.create({ ...order, id: uuidv4()});
+  async findAllByCarId(carId: string) {
+    const orders = await this.orderModel.findAll({ where: { carId } });
+    if (orders) return orders;
+    throw new NotFoundException('Not found', {
+      description: 'There is no order with such an id'
+    })
+  }
+
+  async createOne({ carId, amount, startDate, endDate }: Order) {
+    // const ordersForTheCar = await this.orderModel.findAll({ where: { id: carId } });
+    // let amountOfAvailableCars = 
+
+    // for (const order of ordersForTheCar) {
+
+    // }
+    return this.orderModel.create({ carId, amount, startDate, endDate, id: uuidv4()});
   }
 
   async deleteOne(id: string) {
