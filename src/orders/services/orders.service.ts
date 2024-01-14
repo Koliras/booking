@@ -22,8 +22,24 @@ export class OrdersService {
     })
   }
 
-  async createOne(order) {
-    return this.orderModel.create({ ...order, id: uuidv4()});
+  async findAllByCarId(carId: string) {
+    const orders = await this.orderModel.findAll({ where: { carId } });
+    if (orders) return orders;
+    throw new NotFoundException('Not found', {
+      description: 'There is no order with such an id'
+    })
+  }
+
+  async createOne({ carId, amount, startDate, endDate }: Order) {
+    return this.orderModel.create({ carId, amount, startDate, endDate, id: uuidv4()});
+  }
+
+  async editOne(id: string, { carId, amount, startDate, endDate }: Order) {
+    const wasUpdated = await this.orderModel.update({ carId, amount, startDate, endDate }, { where: { id } });
+    if (wasUpdated) return { status: 201, message: 'Succesfully updated the car' };
+    throw new NotFoundException('Not found', {
+      description: 'There is no car with such an id',
+    })
   }
 
   async deleteOne(id: string) {

@@ -1,15 +1,14 @@
-import { AllowNull, AutoIncrement, Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AllowNull, Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 @Table({ timestamps: false, underscored: true })
 export class Order extends Model {
-  @AutoIncrement
   @PrimaryKey
   @Column
   id: string;
 
   @AllowNull(false)
   @Column
-  carId: number;
+  carId: string;
 
   @AllowNull(false)
   @Column({ defaultValue: 1 })
@@ -17,9 +16,9 @@ export class Order extends Model {
 
   @AllowNull(false)
   @Column
-  startDate: Date;
+  startDate: string;
 
   @AllowNull(false)
   @Column
-  endDate: Date;
+  endDate: string;
 }
